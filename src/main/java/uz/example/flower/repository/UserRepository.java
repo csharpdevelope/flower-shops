@@ -7,5 +7,6 @@ import uz.example.flower.model.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
+    boolean existsByEmail(String email);
     boolean existsByUsername(String username);
 }

@@ -1,0 +1,44 @@
+Index: pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/pom.xml b/pom.xml
+--- a/pom.xml	
++++ b/pom.xml	(date 1655977174700)
+@@ -58,6 +58,19 @@
+             <version>1.6.6</version>
+         </dependency>
+ 
++        <dependency>
++            <groupId>io.minio</groupId>
++            <artifactId>minio</artifactId>
++            <version>8.3.3</version>
++        </dependency>
++
++        <dependency>
++            <groupId>com.squareup.okhttp3</groupId>
++            <artifactId>okhttp</artifactId>
++            <version>4.8.1</version>
++        </dependency>
++
++
+         <dependency>
+             <groupId>org.springframework.boot</groupId>
+             <artifactId>spring-boot-starter-test</artifactId>
+@@ -73,15 +86,12 @@
+             <artifactId>spring-webmvc</artifactId>
+             <version>5.3.18</version>
+         </dependency>
+-<<<<<<< HEAD
+-=======
+ 
+         <dependency>
+             <groupId>org.springframework.amqp</groupId>
+             <artifactId>spring-rabbit-test</artifactId>
+             <scope>test</scope>
+         </dependency>
+->>>>>>> 1afd840 (flower-shopping)
+ 
+         <dependency>
+             <groupId>org.springframework.boot</groupId>

@@ -6,6 +6,7 @@ import uz.example.flower.model.JSend;
 import uz.example.flower.model.dto.db.LoginDto;
 import uz.example.flower.model.dto.db.RegisterDto;
 import uz.example.flower.payload.request.ChangePasswordDto;
+import uz.example.flower.payload.request.UserUpdateDto;
 import uz.example.flower.service.UserService;
 import javax.validation.Valid;
 
@@ -28,6 +29,12 @@ public class AuthSecureController {
     public ResponseEntity<?> register(@RequestBody RegisterDto register) {
         JSend user = userService.saveUser(register);
         return ResponseEntity.ok(user);
+    }
+
+    @PutMapping("update")
+    public ResponseEntity<?> updateData(@RequestBody @Valid UserUpdateDto userUpdate) {
+        JSend response = userService.updateUser(userUpdate);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("reset_password")

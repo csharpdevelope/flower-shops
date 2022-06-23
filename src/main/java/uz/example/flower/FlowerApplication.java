@@ -8,11 +8,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import uz.example.flower.config.MinioConfigurationProperties;
 
 import java.net.InetAddress;
 
 @SpringBootApplication
 @SecurityScheme(name = "Flower Shop", scheme = "bearer", type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER)
+@EnableConfigurationProperties(MinioConfigurationProperties.class)
 public class FlowerApplication implements CommandLineRunner {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

@@ -1,0 +1,228 @@
+Index: src/main/java/uz/example/flower/controller/v1/CheckoutController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/uz/example/flower/controller/v1/CheckoutController.java b/src/main/java/uz/example/flower/controller/v1/CheckoutController.java
+--- a/src/main/java/uz/example/flower/controller/v1/CheckoutController.java	(revision bb3646e5cdd3396c851bc3f94f7d78079a8f38e6)
++++ b/src/main/java/uz/example/flower/controller/v1/CheckoutController.java	(date 1655977222328)
+@@ -36,20 +36,10 @@
+         JSend response = checkOutService.getAllCheckOut(securityUtils.getCurrentUser());
+         return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
+     }
+-    @GetMapping("total/price")
+-    public ResponseEntity<?> getTotalSum() {
+-        JSend response = checkOutService.getTotalSum(securityUtils.getCurrentUser());
+-        return ResponseEntity.ok(response);
+-    }
++
+     @DeleteMapping("delete/{id}")
+     public ResponseEntity<?> delete(@PathVariable("id") Long checkOutId) {
+         JSend response = checkOutService.delete(checkOutId, securityUtils.getCurrentUser());
+         return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
+     }
+-
+-    @DeleteMapping("all")
+-    public ResponseEntity<?> deleteAll() {
+-        JSend response = checkOutService.deleteAll(securityUtils.getCurrentUser());
+-        return ResponseEntity.ok(response);
+-    }
+ }
+Index: src/main/java/uz/example/flower/controller/v1/CategoryController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/uz/example/flower/controller/v1/CategoryController.java b/src/main/java/uz/example/flower/controller/v1/CategoryController.java
+new file mode 100644
+--- /dev/null	(date 1655977222326)
++++ b/src/main/java/uz/example/flower/controller/v1/CategoryController.java	(date 1655977222326)
+@@ -0,0 +1,42 @@
++package uz.example.flower.controller.v1;
++
++import io.swagger.v3.oas.annotations.security.SecurityRequirement;
++import org.springframework.http.HttpStatus;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.*;
++import uz.example.flower.model.JSend;
++import uz.example.flower.service.ProductCategoryService;
++
++import java.util.List;
++
++@RestController
++@RequestMapping("api/v1/category")
++@SecurityRequirement(name = "FLower Shopping")
++public class CategoryController {
++
++    private final ProductCategoryService productCategoryService;
++
++    public CategoryController(ProductCategoryService productCategoryService) {
++        this.productCategoryService = productCategoryService;
++    }
++
++//    @GetMapping("list")
++//    public ResponseEntity<?> getCategories(@RequestParam(value = "ids", required = false) List<Long> ids,
++//                                           @RequestParam(value = "page", required = false) int page,
++//                                           @RequestParam(value = "page_size", required = false) int pageSize) {
++//        JSend response = productCategoryService.getCategory(ids, page, pageSize);
++//        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
++//    }
++
++    @GetMapping
++    public ResponseEntity<?> getCategory() {
++        JSend response = productCategoryService.getCategories();
++        return ResponseEntity.ok(response);
++    }
++
++//    @GetMapping("/{id}")
++//    public ResponseEntity<?> getCategory(@PathVariable(value = "id") Long id) {
++//        JSend response = productCategoryService.getCategory(id);
++//        return ResponseEntity.ok(response);
++//    }
++}
+Index: src/main/java/uz/example/flower/controller/v1/ProductController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/uz/example/flower/controller/v1/ProductController.java b/src/main/java/uz/example/flower/controller/v1/ProductController.java
+new file mode 100644
+--- /dev/null	(date 1655977222319)
++++ b/src/main/java/uz/example/flower/controller/v1/ProductController.java	(date 1655977222319)
+@@ -0,0 +1,88 @@
++package uz.example.flower.controller.v1;
++
++import org.springframework.http.HttpStatus;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.*;
++import org.springframework.web.multipart.MultipartFile;
++import uz.example.flower.model.JSend;
++import uz.example.flower.model.dto.Attachment;
++import uz.example.flower.model.dto.ProductDto;
++import uz.example.flower.service.product.ProductService;
++
++import java.util.List;
++
++@RestController
++@RequestMapping("api/v1/product")
++public class ProductController {
++
++    private final ProductService productService;
++
++    public ProductController(ProductService productService) {
++        this.productService = productService;
++    }
++
++    @PostMapping(value = "save")
++    public ResponseEntity<?> postProduct(@RequestBody ProductDto productDto) {
++        JSend response;
++        if (productDto.getImageIds().isEmpty()) {
++            return ResponseEntity.ok(JSend.fail("Images id not null"));
++        }
++        if (productDto.getGiftTypes().isEmpty()) {
++            return ResponseEntity.ok(JSend.fail("Gift Types not null"));
++        }
++        response = productService.saveProduct(productDto);
++        return ResponseEntity.ok(response);
++    }
++
++    @PostMapping("upload/image")
++    public ResponseEntity<?> uploadImage(@RequestPart(value = "file") MultipartFile file) {
++        Attachment attachment = productService.uploadImage(file);
++        return ResponseEntity.ok(attachment);
++    }
++
++    @GetMapping("all")
++    public ResponseEntity<?> getAllProductsForCustomer(@RequestParam(value = "page", required = false, defaultValue = "0") Integer page,
++                                                       @RequestParam(value = "size", required = false, defaultValue = "10") Integer pageSize) {
++        JSend response = productService.getAllWithPage(page, pageSize);
++        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
++    }
++
++    @GetMapping("get/{id}")
++    public ResponseEntity<?> getById(@PathVariable(value = "id") Long id) {
++        JSend response = productService.getById(id);
++        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
++    }
++
++    @PutMapping("edit")
++    public ResponseEntity<?> editProduct(@RequestPart(value = "body") String body,
++                                         @RequestPart(value = "files") List<MultipartFile> files) {
++        JSend response = productService.editProduct(body, files);
++        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
++    }
++
++    @DeleteMapping("delete/{id}")
++    public ResponseEntity<?> deleteProduct(@PathVariable(value = "id") Long id) {
++        JSend response = productService.deleteProduct(id);
++        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
++    }
++
++    @PatchMapping("change/quantity")
++    public ResponseEntity<?> changeQuantity(@RequestParam(value = "id") Long id,
++                                            @RequestParam(value = "quantity") Long quantity){
++        JSend response = productService.editQuantityProduct(id, quantity);
++        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
++    }
++
++    @PatchMapping("discount")
++    public ResponseEntity<?> discount(@RequestParam(value = "id") Long id,
++                                      @RequestParam(value = "discount") Long discount){
++        JSend response = productService.editDiscount(id, discount);
++        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
++    }
++
++    @DeleteMapping("delete/image")
++    public ResponseEntity<?> deleteImage(@PathVariable(value = "id") Long id) {
++        JSend response = productService.deleteImage(id);
++        return ResponseEntity.ok(response);
++    }
++}
+Index: src/main/java/uz/example/flower/controller/v1/FavoriteController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/main/java/uz/example/flower/controller/v1/FavoriteController.java b/src/main/java/uz/example/flower/controller/v1/FavoriteController.java
+new file mode 100644
+--- /dev/null	(date 1655977222312)
++++ b/src/main/java/uz/example/flower/controller/v1/FavoriteController.java	(date 1655977222312)
+@@ -0,0 +1,38 @@
++package uz.example.flower.controller.v1;
++
++import org.springframework.http.HttpStatus;
++import org.springframework.http.ResponseEntity;
++import org.springframework.web.bind.annotation.*;
++import uz.example.flower.model.JSend;
++import uz.example.flower.service.FavoriteService;
++import uz.example.flower.component.SecurityUtils;
++
++@RestController
++@RequestMapping("api/v1/favorite")
++public class FavoriteController {
++    private final FavoriteService favoriteService;
++    private final SecurityUtils securityUtils;
++
++    public FavoriteController(FavoriteService favoriteService, SecurityUtils securityUtils) {
++        this.favoriteService = favoriteService;
++        this.securityUtils = securityUtils;
++    }
++
++    @PostMapping("create")
++    public ResponseEntity<?> create(@RequestBody Long flower_id) {
++        JSend response = favoriteService.create(flower_id, securityUtils.getCurrentUser());
++        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
++    }
++
++    @DeleteMapping("delete/{id}")
++    public ResponseEntity<?> delete(@PathVariable("id") Long favoriteId) {
++        JSend response = favoriteService.delete(favoriteId, securityUtils.getCurrentUser());
++        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
++    }
++
++    @GetMapping("get")
++    public ResponseEntity<?> getFavorites() {
++        JSend response = favoriteService.getFavorites(securityUtils.getCurrentUser());
++        return new ResponseEntity<>(response, HttpStatus.valueOf(response.getCode()));
++    }
++}
